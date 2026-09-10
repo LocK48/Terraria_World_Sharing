@@ -19,12 +19,11 @@ def check_and_setup_git():
                 messagebox.showwarning("Cảnh báo", "Bạn chưa nhập URL. App có thể không kết nối được Remote.")
                 return
 
-            # Hỏi nhập Personal Access Token (PAT) tùy chọn để tránh lỗi xác thực sau này
-            pat = simpledialog.askstring("Xác thực GitHub (Tùy chọn)", "Nếu bạn dùng Personal Access Token (PAT), hãy dán vào đây (Bỏ trống nếu muốn dùng đăng nhập trình duyệt sẵn có):", show='*')
+            # Hỏi nhập Personal Access Token (PAT) tùy chọn
+            pat = simpledialog.askstring("Xác thực GitHub (Tùy chọn)", "Nếu bạn dùng Personal Access Token (PAT), hãy dán vào đây (Bỏ trống nếu dùng mặc định):", show='*')
             
             final_url = repo_url.strip()
             if pat and pat.strip():
-                # Tự động nhúng PAT vào URL dạng: https://TOKEN@github.com/...
                 if final_url.startswith("https://"):
                     final_url = final_url.replace("https://", f"https://{pat.strip()}@", 1)
 
@@ -82,33 +81,54 @@ def push_to_github():
         if not current_branch:
             current_branch = "master"
 
-        # 6. Thực hiện Push
+        # 6. KIỂM TRA XEM TRÊN GITHUB ĐÃ CÓ NHÁNH NÀY CHƯA TRƯỚC KHI PULL
+        check_remote = subprocess.run(["git", "ls-remote", "--heads", "origin", current_branch], capture_output=True, text=True)
+        remote_branch_exists = bool(check_remote.stdout.strip())
+
+        # Nếu trên remote đã có nhánh này, tiến hành pull --rebase để đồng bộ
+        if remote_branch_exists:
+            pull_res = subprocess.run(["git", "pull", "--rebase", "origin", current_branch], capture_output=True, text=True)
+            
+            # Xử lý nếu pull lỗi do xác thực (403 / Authentication)
+            if pull_res.returncode != 0:
+                full_pull_error = pull_res.stderr.strip() if pull_res.stderr.strip() else pull_res.stdout.strip()
+                if any(err in full_pull_error.lower() for err in ["authentication", "permission", "403", "support for password"]):
+                    if messagebox.askyesno("Lỗi Xác Thực", "Xác thực Git Pull thất bại.\nBạn có muốn cập nhật lại Personal Access Token (PAT) không?"):
+                        new_pat = simpledialog.askstring("Nhập PAT mới", "Dán mã Token (ghp_...) của bạn:", show='*')
+                        if new_pat and new_pat.strip():
+                            rem_res = subprocess.run(["git", "remote", "get-url", "origin"], capture_output=True, text=True)
+                            old_url = rem_res.stdout.strip()
+                            clean_url = old_url
+                            if "@" in clean_url and "https://" in clean_url:
+                                parts = clean_url.split("https://")[1]
+                                clean_url = "https://" + parts.split("@")[1]
+                            new_url = clean_url.replace("https://", f"https://{new_pat.strip()}@", 1)
+                            subprocess.run(["git", "remote", "set-url", "origin", new_url], capture_output=True, text=True)
+                            subprocess.run(["git", "pull", "--rebase", "origin", current_branch], capture_output=True, text=True)
+
+        # 7. Thực hiện Push lên GitHub (Lần đầu sẽ dùng -u để tạo nhánh, các lần sau tự động push)
         push_res = subprocess.run(["git", "push", "-u", "origin", current_branch], capture_output=True, text=True)
         
-        # Nếu push lỗi do xác thực (Authentication / Permission), tự động bật bảng hỏi PAT để fix ngay lập tức
         if push_res.returncode != 0:
             full_push_error = push_res.stderr.strip() if push_res.stderr.strip() else push_res.stdout.strip()
             
-            if any(err_keyword in full_push_error.lower() for err_keyword in ["authentication", "permission", "support for password", "fatal: repository"]):
-                if messagebox.askyesno("Lỗi Xác Thực GitHub", "Push thất bại do lỗi tài khoản hoặc chưa có Token.\nBạn có muốn nhập Personal Access Token (PAT) ngay bây giờ để sửa lỗi không?"):
-                    new_pat = simpledialog.askstring("Nhập Personal Access Token", "Dán mã Token (ghp_...) của bạn vào đây:", show='*')
+            # Nếu push lỗi do 403 / xác thực lần đầu
+            if any(err in full_push_error.lower() for err in ["authentication", "permission", "403", "support for password"]):
+                if messagebox.askyesno("Lỗi Xác Thực GitHub", "Push thất bại do lỗi tài khoản hoặc Token.\nBạn có muốn nhập Personal Access Token (PAT) ngay bây giờ không?"):
+                    new_pat = simpledialog.askstring("Nhập Personal Access Token", "Dán mã Token (ghp_...) của bạn:", show='*')
                     if new_pat and new_pat.strip():
-                        # Lấy URL hiện tại, làm sạch token cũ (nếu có) và gắn token mới vào
                         rem_res = subprocess.run(["git", "remote", "get-url", "origin"], capture_output=True, text=True)
                         old_url = rem_res.stdout.strip()
-                        
                         clean_url = old_url
                         if "@" in clean_url and "https://" in clean_url:
                             parts = clean_url.split("https://")[1]
                             clean_url = "https://" + parts.split("@")[1]
-                        
                         new_url = clean_url.replace("https://", f"https://{new_pat.strip()}@", 1)
                         subprocess.run(["git", "remote", "set-url", "origin", new_url], capture_output=True, text=True)
                         
-                        # Thử push lại lần nữa với PAT mới
                         retry_res = subprocess.run(["git", "push", "-u", "origin", current_branch], capture_output=True, text=True)
                         if retry_res.returncode == 0:
-                            messagebox.showinfo("Thành công", f"Đã cấu hình lại Token và đẩy file lên GitHub (nhánh {current_branch}) thành công!")
+                            messagebox.showinfo("Thành công", f"Đã cấu hình Token và đẩy file lên GitHub (nhánh {current_branch}) thành công!")
                             return
                         else:
                             full_push_error = retry_res.stderr.strip()
