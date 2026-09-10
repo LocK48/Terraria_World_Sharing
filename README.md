@@ -27,8 +27,6 @@ python terraria_auto_update_wld.py
 
 ```
 
-
-
 ### Cách 2: Tự đóng gói thành file chạy nhanh (`.exe`)
 
 Nếu bạn muốn tạo file chạy độc lập dạng `.exe` để bấm là chạy:
@@ -38,7 +36,6 @@ Nếu bạn muốn tạo file chạy độc lập dạng `.exe` để bấm là 
 pip install pyinstaller
 
 ```
-
 
 2. Chạy lệnh đóng gói không hiện cửa sổ dòng lệnh:
 ```bash
@@ -51,26 +48,34 @@ pyinstaller --noconsole --onefile terraria_auto_update_wld.py
 
 ---
 
-## Hướng dẫn sử dụng chi tiết
+## Hướng dẫn sử dụng cho người chơi
 
-1. **Khởi chạy ứng dụng** (mở `terraria_auto_update_wld.py` hoặc file `terraria_auto_update_wld.exe`).
-2. **Thiết lập lần đầu:**
-* Ngay khi mở terraria_auto_update_wld lên lần đầu tiên trong một thư mục trống, một bảng nhỏ sẽ hiện ra yêu cầu bạn nhập **URL Repository GitHub** (Ví dụ: `[https://github.com/ten-tai-khoan/terraria-worlds.git](https://github.com/ten-tai-khoan/terraria-worlds.git)`). terraria_auto_update_wld sẽ tự động khởi tạo kết nối.
+1. **Khởi chạy ứng dụng:** Mở file ứng dụng (hoặc chạy file `.exe` nếu đã được đóng gói).
+2. **Cấu hình lần đầu (Chỉ cần làm 1 lần duy nhất):**
+* Ngay khi mở lên, app sẽ yêu cầu bạn nhập **URL Repository GitHub** (Ví dụ: `[https://github.com/ten-tai-khoan/terraria-worlds.git](https://github.com/ten-tai-khoan/terraria-worlds.git)`).
+* Tiếp theo, app sẽ hỏi nhập **Personal Access Token (PAT)**. Bạn có thể dán mã Token của mình vào đây (hoặc bỏ trống nếu muốn dùng cơ chế đăng nhập trình duyệt sẵn có của Git).
 
 
-3. **Chọn thế giới Terraria:**
-* Bấm nút **Chọn file** để mở nhanh thư mục lưu trữ thế giới mặc định của game (thường nằm ở `Documents\My Games\Terraria\Worlds`).
+3. **Chọn thế giới cần lưu:**
+* Bấm nút **Chọn file** $\rightarrow$ App sẽ tự động trỏ thẳng vào thư mục chứa thế giới mặc định của game (`Documents\My Games\Terraria\Worlds`).
 * Chọn file `.wld` của thế giới bạn vừa chơi xong.
 
 
-4. **Nhập ghi chú (Tùy chọn):**
-* Nhập nội dung mô tả thay đổi ở ô *Nội dung Commit* (hoặc giữ nguyên mặc định).
+4. **Nhập ghi chú và Đẩy lên:**
+* Nhập nội dung mô tả vào ô *Nội dung Commit* (hoặc giữ nguyên mặc định).
+* Bấm nút lớn **Push lên GitHub** màu xanh lá và chờ thông báo thành công!
 
 
-5. **Đẩy lên GitHub:**
-* Bấm nút lớn **Push lên GitHub**.
-* Ứng dụng sẽ tự động thực hiện các bước: *Copy file vào thư mục -> `git add` -> `git commit` -> `git push` lên GitHub*.
+---
 
+## 🛠️ Hướng dẫn lấy Personal Access Token (PAT) trên GitHub
+
+Nếu gặp lỗi xác thực khi push, bạn có thể tạo một Token riêng để app hoạt động mượt mà:
+
+1. Đăng nhập vào [GitHub](https://github.com) -> Vào **Settings** (Cài đặt tài khoản) -> **Developer settings**.
+2. Chọn **Personal access tokens** -> **Tokens (classic)** -> Bấm **Generate new token (classic)**.
+3. Đặt tên gợi nhớ và **bắt buộc tích chọn ô `repo**` (Full control of private repositories).
+4. Kéo xuống dưới cùng bấm **Generate token** và copy đoạn mã bắt đầu bằng `ghp_...` để dán vào ứng dụng khi được hỏi.
 
 
 ---
@@ -83,3 +88,11 @@ pyinstaller --noconsole --onefile terraria_auto_update_wld.py
 
 * **File không thay đổi:**
 * Nếu terraria_auto_update_wld báo *"File thế giới này không có thay đổi gì mới"*, có nghĩa là bạn chưa lưu game hoặc file `.wld` chưa có thay đổi nào mới so với lần đồng bộ trước đó.
+
+
+* **Lỗi 403 Forbidden / Xác thực thất bại:**
+* Do Windows đang lưu cache tài khoản cũ trong *Credential Manager*. Hãy mở *Credential Manager* trên Windows $\rightarrow$ chọn *Windows Credentials* $\rightarrow$ tìm và xóa các dòng liên quan đến `git:[https://github.com](https://github.com)`, sau đó chạy lại app và nhập Token mới.
+
+
+* **Lỗi không tìm thấy file `.wld`:**
+* Hãy chắc chắn bạn đã thoát game hoặc game đã lưu (save) thế giới hoàn tất trước khi bấm chọn file.
