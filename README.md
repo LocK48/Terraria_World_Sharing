@@ -17,13 +17,13 @@ Không cần nhớ lệnh Git phức tạp, không cần gõ Terminal thủ côn
 
 ## Hướng dẫn cài đặt và sử dụng
 
-### Cách 1: Sử dụng file mã nguồn Python (`app.py`)
+### Cách 1: Sử dụng file mã nguồn Python (`terraria_auto_update_wld.py`)
 
 1. Đảm bảo máy tính của bạn đã cài đặt **Python**.
-2. Tải file `app.py` và đặt nó vào thư mục trống mà bạn muốn dùng làm kho lưu trữ Git cho thế giới Terraria.
+2. Tải file `terraria_auto_update_wld.py` và đặt nó vào thư mục trống mà bạn muốn dùng làm kho lưu trữ Git cho thế giới Terraria.
 3. Mở terminal/CMD tại thư mục đó và chạy lệnh:
 ```bash
-python app.py
+python terraria_auto_update_wld.py
 
 ```
 
@@ -42,20 +42,20 @@ pip install pyinstaller
 
 2. Chạy lệnh đóng gói không hiện cửa sổ dòng lệnh:
 ```bash
-pyinstaller --noconsole --onefile app.py
+pyinstaller --noconsole --onefile terraria_auto_update_wld.py
 
 ```
 
 
-3. Lấy file `.exe` thành phẩm nằm trong thư mục **`dist/app.exe`** mang ra sử dụng bất cứ lúc nào bạn muốn.
+3. Lấy file `.exe` thành phẩm nằm trong thư mục **`dist/terraria_auto_update_wld.exe`** mang ra sử dụng bất cứ lúc nào bạn muốn.
 
 ---
 
 ## Hướng dẫn sử dụng chi tiết
 
-1. **Khởi chạy ứng dụng** (mở `app.py` hoặc file `app.exe`).
+1. **Khởi chạy ứng dụng** (mở `terraria_auto_update_wld.py` hoặc file `terraria_auto_update_wld.exe`).
 2. **Thiết lập lần đầu:**
-* Ngay khi mở app lên lần đầu tiên trong một thư mục trống, một bảng nhỏ sẽ hiện ra yêu cầu bạn nhập **URL Repository GitHub** (Ví dụ: `[https://github.com/ten-tai-khoan/terraria-worlds.git](https://github.com/ten-tai-khoan/terraria-worlds.git)`). App sẽ tự động khởi tạo kết nối.
+* Ngay khi mở terraria_auto_update_wld lên lần đầu tiên trong một thư mục trống, một bảng nhỏ sẽ hiện ra yêu cầu bạn nhập **URL Repository GitHub** (Ví dụ: `[https://github.com/ten-tai-khoan/terraria-worlds.git](https://github.com/ten-tai-khoan/terraria-worlds.git)`). terraria_auto_update_wld sẽ tự động khởi tạo kết nối.
 
 
 3. **Chọn thế giới Terraria:**
@@ -69,7 +69,7 @@ pyinstaller --noconsole --onefile app.py
 
 5. **Đẩy lên GitHub:**
 * Bấm nút lớn **Push lên GitHub**.
-* Ứng dụng sẽ tự động thực hiện các bước: *Copy file vào thư mục $\rightarrow$ `git add` $\rightarrow$ `git commit` $\rightarrow$ `git push` lên GitHub*.
+* Ứng dụng sẽ tự động thực hiện các bước: *Copy file vào thư mục -> `git add` -> `git commit` -> `git push` lên GitHub*.
 
 
 
@@ -82,4 +82,4 @@ pyinstaller --noconsole --onefile app.py
 
 
 * **File không thay đổi:**
-* Nếu app báo *"File thế giới này không có thay đổi gì mới"*, có nghĩa là bạn chưa lưu game hoặc file `.wld` chưa có thay đổi nào mới so với lần đồng bộ trước đó.
+* Nếu terraria_auto_update_wld báo *"File thế giới này không có thay đổi gì mới"*, có nghĩa là bạn chưa lưu game hoặc file `.wld` chưa có thay đổi nào mới so với lần đồng bộ trước đó.
